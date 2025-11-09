@@ -51,18 +51,15 @@ fun MovieListingRoute(
         onMovieClicked = { viewModel.handleIntent(MoviesScreenIntent.MovieClicked(movie = it)) },
         uiState = movieListingUiState,
         onPaginationReached = { viewModel.handleIntent(MoviesScreenIntent.LoadPaginatedMovies(genre = it)) },
-        onGenreDropDownSelection = {
+        onSelectGenreClicked = {
             viewModel.handleIntent(MoviesScreenIntent.ShowGenres)
-        })
-
-    if (genreDropDownExpanded) {
-        GenreDropDown(
-            genreListUiState = genreDropDownUiState, onDismissRequest = {
-            genreDropDownExpanded = false
-        }, onGenreClicked = {
+        },
+        isGenreDropDownExpanded = genreDropDownExpanded,
+        onDismissRequest = { genreDropDownExpanded = false },
+        genresUiState = genreDropDownUiState,
+        onGenreSelected = {
             viewModel.handleIntent(MoviesScreenIntent.ChangeGenre(genreUi = it))
             genreDropDownExpanded = false
-        }, expanded = genreDropDownExpanded
-        )
-    }
+        })
+
 }

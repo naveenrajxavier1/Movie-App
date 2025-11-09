@@ -44,9 +44,9 @@ class MovieListingViewModel @Inject constructor(
                 initialValue = MovieListingUiState.Loading
             )
 
-    private val _genresUiState: MutableStateFlow<GenreListUiState> =
-        MutableStateFlow(GenreListUiState.Loading)
-    val genresUiState: StateFlow<GenreListUiState> = _genresUiState
+    private val _genresUiState: MutableStateFlow<GenresUiState> =
+        MutableStateFlow(GenresUiState.Loading)
+    val genresUiState: StateFlow<GenresUiState> = _genresUiState
 
     private val _effectChannel = Channel<MovieScreenEffect>()
     val effectFlow: Flow<MovieScreenEffect> = _effectChannel.receiveAsFlow()
@@ -139,7 +139,7 @@ class MovieListingViewModel @Inject constructor(
                         selectedGenreName = selectedGenreName
                     )
 
-                    _genresUiState.update { GenreListUiState.Success(fullGenreList) }
+                    _genresUiState.update { GenresUiState.Success(fullGenreList) }
                     _effectChannel.send(MovieScreenEffect.ShowGenreDropdown)
                 }
 
@@ -184,10 +184,10 @@ sealed class MovieListingUiState {
     data class Error(val message: String) : MovieListingUiState()
 }
 
-sealed interface GenreListUiState {
-    data object Loading : GenreListUiState
-    data class Success(val list: List<GenreUi>) : GenreListUiState
-    data class Error(val message: String) : GenreListUiState
+sealed interface GenresUiState {
+    data object Loading : GenresUiState
+    data class Success(val list: List<GenreUi>) : GenresUiState
+    data class Error(val message: String) : GenresUiState
 }
 
 sealed interface MovieScreenEffect {

@@ -18,32 +18,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.troweprice.moviesapp.movieslisting.ui.model.GenreUi
 import com.troweprice.moviesapp.ui.theme.yellow
 
 @Composable
 fun GenreDropDown(
-    genreListUiState: GenreListUiState,
+    genresUiState: GenresUiState,
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    onGenreClicked: (GenreUi) -> Unit,
+    onGenreSelected: (GenreUi) -> Unit,
 ) {
-    when (genreListUiState) {
-        is GenreListUiState.Success -> {
+    when (genresUiState) {
+        is GenresUiState.Success -> {
             GenreListing(
-                genres = genreListUiState.list,
+                genres = genresUiState.list,
                 onDismissRequest = onDismissRequest,
                 expanded = expanded,
-                onGenreClicked = onGenreClicked
+                onGenreSelected = onGenreSelected
             )
         }
 
-        is GenreListUiState.Error -> {
-            Text(text = genreListUiState.message)
+        is GenresUiState.Error -> {
+            Text(text = genresUiState.message)
         }
 
-        GenreListUiState.Loading -> {
+        GenresUiState.Loading -> {
             Text(text = "Loading..")
         }
     }
@@ -52,19 +53,19 @@ fun GenreDropDown(
 @Composable
 fun GenreListing(
     genres: List<GenreUi>,
-    onGenreClicked: (GenreUi) -> Unit,
+    onGenreSelected: (GenreUi) -> Unit,
     expanded: Boolean,
     onDismissRequest: () -> Unit
 ) {
     DropdownMenu(
         expanded = expanded,
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
     ) {
         genres.forEach { item ->
             DropdownMenuItem(enabled = !item.isSelected,
                 text = { GenreTile(item) },
                 onClick = {
-                    onGenreClicked.invoke(item)
+                    onGenreSelected.invoke(item)
                 }
             )
             HorizontalDivider()
@@ -113,11 +114,11 @@ fun ShowGenes() {
         genres = getGenreList(),
         onDismissRequest = {},
         expanded = true,
-        onGenreClicked = {})
+        onGenreSelected = {})
 }
 
 
-private fun getGenreList(): List<GenreUi> {
+fun getGenreList(): List<GenreUi> {
     return mutableListOf<GenreUi>().apply {
         repeat(10) {
             add(genre.copy(name = "Action (120 movies) ${(it + 1)}"))

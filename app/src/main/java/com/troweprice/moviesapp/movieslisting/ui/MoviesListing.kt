@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.troweprice.moviesapp.R
+import com.troweprice.moviesapp.movieslisting.ui.model.GenreUi
 import com.troweprice.moviesapp.movieslisting.ui.model.MovieUi
 import com.troweprice.moviesapp.ui.theme.yellow
 
@@ -40,9 +41,13 @@ import com.troweprice.moviesapp.ui.theme.yellow
 fun MoviesListingScreen(
     modifier: Modifier = Modifier,
     uiState: MovieListingUiState,
+    isGenreDropDownExpanded: Boolean,
+    genresUiState: GenresUiState,
+    onDismissRequest: () -> Unit,
     onMovieClicked: (MovieUi) -> Unit,
     onPaginationReached: (genre: String) -> Unit,
-    onGenreDropDownSelection: () -> Unit
+    onSelectGenreClicked: () -> Unit,
+    onGenreSelected: (GenreUi) -> Unit
 ) {
     Column(modifier = modifier) {
         when (uiState) {
@@ -58,7 +63,11 @@ fun MoviesListingScreen(
                 MovieListingHeader(
                     showGenreSection = true,
                     selectedGenre = uiState.selectedGenre,
-                    onSelectGenreClicked = onGenreDropDownSelection
+                    isGenreDropDownExpanded = isGenreDropDownExpanded,
+                    onSelectGenreClicked = onSelectGenreClicked,
+                    genresUiState = genresUiState,
+                    onDismissGenreRequest = onDismissRequest,
+                    onGenreSelected = onGenreSelected,
                 )
                 MoviesListing(
                     list = uiState.list,
@@ -85,7 +94,11 @@ fun ErrorScreen(error: String) {
 fun MovieListingHeader(
     showGenreSection: Boolean = true,
     selectedGenre: String,
-    onSelectGenreClicked: () -> Unit
+    isGenreDropDownExpanded: Boolean = false,
+    genresUiState: GenresUiState,
+    onGenreSelected: (GenreUi) -> Unit,
+    onSelectGenreClicked: () -> Unit,
+    onDismissGenreRequest: () -> Unit
 ) {
     Column {
         Text(
@@ -105,14 +118,27 @@ fun MovieListingHeader(
                     color = Color.Blue,
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.clickable { onSelectGenreClicked.invoke() }
+                    modifier = Modifier
+                        .clickable { onSelectGenreClicked.invoke() }
+                        .padding(16.dp)
                 )
                 Text(
                     text = selectedGenre,
-                    modifier = Modifier.padding(start = 16.dp),
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .align(Alignment.CenterVertically),
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = TextAlign.Center
                 )
+
+                if (isGenreDropDownExpanded) {
+                    GenreDropDown(
+                        genresUiState = genresUiState,
+                        onGenreSelected = onGenreSelected,
+                        onDismissRequest = onDismissGenreRequest,
+                        expanded = isGenreDropDownExpanded
+                    )
+                }
             }
         }
     }
@@ -128,7 +154,7 @@ fun MoviesListing(
 ) {
     Box {
         val listState = rememberLazyListState()
-        val isAtBottom by remember  {
+        val isAtBottom by remember {
             derivedStateOf {
                 val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
                 lastVisibleItem?.index != 0 && lastVisibleItem?.index == listState.layoutInfo.totalItemsCount - 1
@@ -187,12 +213,12 @@ fun MovieTile(movie: MovieUi, onMovieClicked: (MovieUi) -> Unit) {
                     modifier = Modifier.weight(.85f, false)
                 )
                 Text(
-                    text = movie.releaseYear,
+                    text = "(${movie.releaseYear})",
                     maxLines = 1,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .padding(start = 8.dp)
-                        .weight(.15f)
+                        .weight(.20f)
                 )
             }
 
@@ -230,7 +256,11 @@ fun ShowMoviesListingScreen() {
         ), onMovieClicked = {},
         modifier = Modifier,
         onPaginationReached = {},
-        onGenreDropDownSelection = {}
+        onSelectGenreClicked = {},
+        isGenreDropDownExpanded = false,
+        onDismissRequest = {},
+        genresUiState = GenresUiState.Success(getGenreList()),
+        onGenreSelected = {}
     )
 }
 

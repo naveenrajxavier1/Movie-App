@@ -179,8 +179,8 @@ class MovieListingViewModelTest {
         val stateJob = launch {
             viewModel.genresUiState.test {
                 val successState = awaitItem()
-                assertTrue("Expected Success state", successState is GenreListUiState.Success)
-                assertEquals(uiGenres, (successState as GenreListUiState.Success).list)
+                assertTrue("Expected Success state", successState is GenresUiState.Success)
+                assertEquals(uiGenres, (successState as GenresUiState.Success).list)
                 expectNoEvents()
             }
         }

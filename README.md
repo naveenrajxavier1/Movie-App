@@ -4,7 +4,7 @@ MoviesApp is a sample Android application designed to showcase a modern, scalabl
 
 This project serves as a practical example of Clean Architecture principles combined with the latest Android Jetpack libraries and industry-best practices.
 
-![Movie Listing Screen](Screenshot_listing.png)
+![Movie Listing Screen](Screenshot_listing.png) ![Genre Listing Screen](Screenshot_listing1.png)
 
 ## ✨ Features
 
