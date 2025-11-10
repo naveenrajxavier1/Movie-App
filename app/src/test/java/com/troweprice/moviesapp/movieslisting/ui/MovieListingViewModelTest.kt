@@ -63,6 +63,35 @@ class MovieListingViewModelTest {
     }
 
     @Test
+    fun `handleIntent LoadPaginatedMovies Given GetMovies returns success Then updates state from Suceess-Loading to Success`() = runTest {
+        // GIVEN
+        val domainMovies = listOf(mockk<Movie>())
+        val uiMovies = listOf(mockk<MovieUi>())
+        val genre = "Action"
+        val successResult = MoviesResult.Success(movies = domainMovies, isLastPage = false)
+
+        coEvery { getMovies(isFreshLoading = false, genre = genre) } returns successResult
+        coEvery { movieToMovieUiMapper.map(any()) } returns uiMovies.first()
+
+        // VERIFY
+        val stateJob = launch {
+            viewModel.movieListingUiState.test {
+                assertTrue("State should be Loading", awaitItem() is MovieListingUiState.Success)
+                val successState = awaitItem()
+                assertTrue(
+                    "Expected Success state, but was ${successState::class.simpleName}",
+                    successState is MovieListingUiState.Success
+                )
+                assertEquals(uiMovies, (successState as MovieListingUiState.Success).list)
+                expectNoEvents()
+            }
+        }
+        // TEST
+        viewModel.handleIntent(MoviesScreenIntent.LoadPaginatedMovies(genre = genre))
+        stateJob.cancel()
+    }
+
+    @Test
     fun `handleIntent LoadMovies Given GetMovies returns success Then updates state from Loading to Success`() = runTest {
         // GIVEN
         val domainMovies = listOf(mockk<Movie>())
