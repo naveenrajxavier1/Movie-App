@@ -63,7 +63,7 @@ class MovieListingViewModelTest {
     }
 
     @Test
-    fun `handleIntent LoadMovies - success - updates state from Loading to Success`() = runTest {
+    fun `handleIntent LoadMovies Given GetMovies returns success Then updates state from Loading to Success`() = runTest {
         // GIVEN
         val domainMovies = listOf(mockk<Movie>())
         val uiMovies = listOf(mockk<MovieUi>())
@@ -92,7 +92,7 @@ class MovieListingViewModelTest {
     }
 
     @Test
-    fun `handleIntent LoadMovies - generic error - updates state to Error and sends effect`() =
+    fun `handleIntent LoadMovies Given GetMovies returns generic error Then updates state to Error and sends effect`() =
         runTest {
             // GIVEN
             val errorMessage = "Something went wrong"
@@ -136,7 +136,7 @@ class MovieListingViewModelTest {
 
 
     @Test
-    fun `handleIntent LoadMovies - no internet - updates state to Error and sends effect`() =
+    fun `handleIntent LoadMovies Given GetMovies returns no internet Then updates state to Error and sends effect`() =
         runTest {
             // GIVEN
             val genre = "Action"
@@ -167,7 +167,7 @@ class MovieListingViewModelTest {
         }
 
     @Test
-    fun `handleIntent ShowGenres - success - updates state and sends effect`() = runTest {
+    fun `handleIntent ShowGenres Given GetGenres returns success Then updates state and sends effect`() = runTest {
         // GIVEN
         val domainGenres = listOf(mockk<Genre>())
         val uiGenres = listOf(mockk<GenreUi>())
@@ -199,7 +199,7 @@ class MovieListingViewModelTest {
     }
 
     @Test
-    fun `handleIntent MovieClicked - sends OpenMoviePage effect`() = runTest {
+    fun `handleIntent MovieClicked Then sends OpenMoviePage effect`() = runTest {
         // GIVEN
         val movieUrl = "https://example.com/movie/1"
         val movieUi = MovieUi("1", "Action", "2022", "The Batman", "An overview...", movieUrl)

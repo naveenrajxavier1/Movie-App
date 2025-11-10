@@ -1,4 +1,4 @@
-# 🎬 MoviesApp
+# 🎬 MoviesApp (Under progress)
 
 MoviesApp is a sample Android application designed to showcase a modern, scalable, and maintainable Android architecture. It allows users to browse through a list of movies, filter them by genre, and view their details.
 
@@ -23,6 +23,14 @@ This project follows the principles of **Clean Architecture** and **MVVM (Model-
 -   **Domain Layer**: The core business logic of the application. It is a pure Kotlin module with no Android dependencies, making it highly reusable and testable. It defines `UseCases` (e.g., `GetMovies`, `GetGenres`) that encapsulate specific business rules.
 -   **Data Layer**: Manages the data sources. It implements the repository pattern to abstract data sources (network, local database) from the rest of the app.
 
+### Undergoing activities:
+This project is still undergoing activities, which is listed below
+-   **Improving the Movie listing and Genre listing user interface
+-   **Fix critical UI issues
+-   **Needs to add Compose UI tests
+-   **Add Integration and END to END tests ( IMoviesRepository to create new fake repos)
+-   **Needs to add More unit tests currently only added to viewmodel
+-   **Improve pagination logic if needed (can use pagination library from Jetpack compose)
 ### Key Libraries Used:
 
 -   **[Kotlin](https://kotlinlang.org/)**: First-party and recommended language for Android development.
