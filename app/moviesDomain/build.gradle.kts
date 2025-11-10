@@ -5,7 +5,9 @@ plugins {
 
 dependencies {
     implementation(libs.inject)
-    implementation(libs.kotlinx.coroutines.core) // Example for coroutines
+    implementation(libs.kotlinx.coroutines.core)
     testImplementation(libs.junit)
-
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
 }

@@ -55,9 +55,7 @@ class MovieListingViewModel @Inject constructor(
         when (intent) {
             is MoviesScreenIntent.LoadMovies -> loadMovies(
                 genreName = intent.genre
-            ).also {
-                println("loadMovies() w ith genreName: $intent.genre")
-            }
+            )
 
             is MoviesScreenIntent.LoadPaginatedMovies -> loadMovies(
                 genreName = intent.genre,
@@ -83,7 +81,6 @@ class MovieListingViewModel @Inject constructor(
 
     private fun loadMovies(genreName: String, isPaginatedRequest: Boolean = false) {
         viewModelScope.launch {
-            println("loadMovies called with genreName: $genreName isPaginated $isPaginatedRequest")
             if (!isPaginatedRequest) {
                 _movieListingUiState.update { MovieListingUiState.Loading }
             } else {

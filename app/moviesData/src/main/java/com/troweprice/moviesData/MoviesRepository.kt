@@ -1,6 +1,5 @@
 package com.troweprice.moviesData
 
-import android.util.Log
 import com.troweprice.commonlib.IMapper
 import com.troweprice.moviesData.local.IMoviesLocalDataSource
 import com.troweprice.moviesData.model.GenreData
@@ -51,7 +50,7 @@ class MoviesRepository @Inject constructor(
     ): MoviesResult {
         return withContext(coroutineDispatcher) {
             try {
-                val resolvedLimit = limit ?: DEFAULT_MOVIES_PAGE_COUNT
+                val requestedPageSize = limit ?: DEFAULT_MOVIES_PAGE_COUNT
 
                 if (isFreshLoading) {
                     moviesRemoteRepository.getGenres().getOrThrow()
@@ -61,10 +60,10 @@ class MoviesRepository @Inject constructor(
 
                 val offset =
                     if (isFreshLoading) 0 else moviesLocalRepository.getCachedMoviesCount() + 1
-                Log.v("TestMovies", "pagination offset $offset and $isFreshLoading")
+               // Log.v("TestMovies", "pagination offset $offset and $isFreshLoading")
                 val remoteMovies = moviesRemoteRepository.getMovies(
                     genre = genre,
-                    limit = resolvedLimit,
+                    limit = requestedPageSize,
                     offset = offset
                 ).getOrThrow()
 
@@ -75,7 +74,7 @@ class MoviesRepository @Inject constructor(
 
                 return@withContext MoviesResult.Success(
                     movies = mappedMovies,
-                    isLastPage = remoteMovies.size < resolvedLimit
+                    isLastPage = remoteMovies.size < requestedPageSize
                 )
             } catch (e: Exception) {
                 return@withContext moviesDataErrorMapper.map(e)
