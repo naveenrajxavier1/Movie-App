@@ -25,12 +25,15 @@ This project follows the principles of **Clean Architecture** and **MVVM (Model-
 
 ### Undergoing activities:
 This project is still undergoing activities, which is listed below
--   **Improving the Movie listing and Genre listing user interface
--   **Fix critical UI issues
--   **Needs to add Compose UI tests
--   **Add Integration and END to END tests ( IMoviesRepository to create new fake repos)
--   **Needs to add More unit tests currently only added to viewmodel
--   **Improve pagination logic if needed (can use pagination library from Jetpack compose)
+-   Add Compose UI tests.
+-   Add Integration and END to END tests ( IMoviesRepository to create new fake repos)
+-   Fix critical UI issues (Glitches, Dark mode issue, UI positioning)
+-   Improving the Movie listing and Genre listing user interface
+-   Improve pagination logic if needed (can use pagination library from Jetpack compose)
+-   Needs to add More unit tests (currently only added to viewmodel)
+-   CI 
+-   Benchmarking
+
 ### Key Libraries Used:
 
 -   **[Kotlin](https://kotlinlang.org/)**: First-party and recommended language for Android development.
