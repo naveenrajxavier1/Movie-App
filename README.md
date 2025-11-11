@@ -30,7 +30,7 @@ This project is still undergoing activities, which is listed below
 -   Fix critical UI issues (Glitches, Dark mode issue, UI positioning)
 -   Improving the Movie listing and Genre listing user interface
 -   Improve pagination logic if needed (can use pagination library from Jetpack compose)
--   Needs to add More unit tests (currently only added to viewmodel)
+-   Needs to add More unit tests
 -   CI 
 -   Benchmarking
 
