@@ -100,13 +100,11 @@ class MoviesRepositoryTest {
             val remoteMovies: List<MovieData> = movieDataMockList
 
             // Mock remote data source behavior
-            coEvery { moviesRemoteDataSource.getGenres() } returns Result.success(emptyList())
             coEvery { moviesRemoteDataSource.getMovies(genre, limit, 0) } returns Result.success(
                 remoteMovies
             )
 
             // Mock local data source behavior
-            coEvery { moviesLocalDataSource.cacheGenres(any()) } just runs
             coEvery { moviesLocalDataSource.clearMovies() } just runs
             coEvery { moviesLocalDataSource.cacheMovies(remoteMovies) } just runs
             coEvery { moviesLocalDataSource.getAllMovies() } returns remoteMovies
@@ -116,8 +114,6 @@ class MoviesRepositoryTest {
 
             // TEST: Verify the logic for a fresh load
             coVerifyOrder {
-                moviesRemoteDataSource.getGenres()
-                moviesLocalDataSource.cacheGenres(any())
                 moviesLocalDataSource.clearMovies()
                 moviesRemoteDataSource.getMovies(genre, limit, 0)
                 moviesLocalDataSource.cacheMovies(remoteMovies)
@@ -206,7 +202,8 @@ class MoviesRepositoryTest {
         val exception = IOException("Network Error")
         val expectedError = MoviesResult.MoviesError.NoInternetException
 
-        coEvery { moviesRemoteDataSource.getGenres() } returns Result.failure(exception)
+        coEvery { moviesLocalDataSource.clearMovies() } just runs
+        coEvery { moviesRemoteDataSource.getMovies(genre = null, limit = 10, 0) } throws exception
         every { moviesDataErrorMapper.map(exception) } returns expectedError
 
         // TEST: getMovies is called and the remote source fails

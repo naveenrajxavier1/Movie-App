@@ -49,7 +49,7 @@ fun MoviesListingScreen(
     onSelectGenreClicked: () -> Unit,
     onGenreSelected: (GenreUi) -> Unit
 ) {
-    Column(modifier = modifier) {
+
         when (uiState) {
             MovieListingUiState.Loading -> {
                 Progress()
@@ -60,28 +60,61 @@ fun MoviesListingScreen(
             }
 
             is MovieListingUiState.Success -> {
-                MovieListingHeader(
-                    showGenreSection = true,
+                SucessScreen(
+                    modifier = modifier,
+                    movies = uiState.list,
                     selectedGenre = uiState.selectedGenre,
-                    isGenreDropDownExpanded = isGenreDropDownExpanded,
-                    onSelectGenreClicked = onSelectGenreClicked,
-                    genresUiState = genresUiState,
-                    onDismissGenreRequest = onDismissRequest,
-                    onGenreSelected = onGenreSelected,
-                )
-                MoviesListing(
-                    list = uiState.list,
                     showPaginationLoader = uiState.isPaginatedRequest,
+                    isEndReached = uiState.isEndReached,
+                    genresUiState = genresUiState,
+                    isGenreDropDownExpanded = isGenreDropDownExpanded,
+                    onDismissRequest = onDismissRequest,
                     onMovieClicked = onMovieClicked,
-                    onPaginationReached = {
-                        onPaginationReached.invoke(uiState.selectedGenre)
-                    },
-                    isEndOfMovies = uiState.isEndReached
+                    onPaginationReached = onPaginationReached,
+                    onSelectGenreClicked = onSelectGenreClicked,
+                    onGenreSelected = onGenreSelected
                 )
             }
         }
+}
+
+@Composable
+fun SucessScreen(
+    modifier: Modifier = Modifier,
+    movies: List<MovieUi>,
+    selectedGenre: String,
+    showPaginationLoader: Boolean,
+    isEndReached: Boolean,
+    genresUiState: GenresUiState,
+    isGenreDropDownExpanded: Boolean,
+    onDismissRequest: () -> Unit,
+    onMovieClicked: (MovieUi) -> Unit,
+    onPaginationReached: (genre: String) -> Unit,
+    onSelectGenreClicked: () -> Unit,
+    onGenreSelected: (GenreUi) -> Unit
+) {
+    Column(modifier = modifier) {
+        MovieListingHeader(
+            showGenreSection = true,
+            selectedGenre = selectedGenre,
+            isGenreDropDownExpanded = isGenreDropDownExpanded,
+            onSelectGenreClicked = onSelectGenreClicked,
+            genresUiState = genresUiState,
+            onDismissGenreRequest = onDismissRequest,
+            onGenreSelected = onGenreSelected,
+        )
+        MoviesListing(
+            list = movies,
+            showPaginationLoader = showPaginationLoader,
+            onMovieClicked = onMovieClicked,
+            onPaginationReached = {
+                onPaginationReached.invoke(selectedGenre)
+            },
+            isEndOfMovies = isEndReached
+        )
     }
 }
+
 
 @Composable
 fun ErrorScreen(error: String) {
