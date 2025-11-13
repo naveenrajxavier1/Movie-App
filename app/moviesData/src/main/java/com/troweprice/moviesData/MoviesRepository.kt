@@ -53,8 +53,6 @@ class MoviesRepository @Inject constructor(
                 val requestedPageSize = limit ?: DEFAULT_MOVIES_PAGE_COUNT
 
                 if (isFreshLoading) {
-                    moviesRemoteRepository.getGenres().getOrThrow()
-                        .let { moviesLocalRepository.cacheGenres(it) }
                     moviesLocalRepository.clearMovies()
                 }
 

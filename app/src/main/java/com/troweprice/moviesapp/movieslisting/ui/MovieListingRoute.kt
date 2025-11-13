@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,7 +22,7 @@ fun MovieListingRoute(
 ) {
     var genreDropDownExpanded by remember { mutableStateOf(false) }
     var snackbarMessage by remember { mutableStateOf<Pair<Int, String>?>(null) }
-
+    var scope = rememberCoroutineScope()
     LaunchedEffect(key1 = viewModel.effectFlow) {
         viewModel.effectFlow.collect {
             when (it) {
