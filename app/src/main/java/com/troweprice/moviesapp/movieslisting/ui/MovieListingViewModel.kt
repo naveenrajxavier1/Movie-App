@@ -35,13 +35,13 @@ class MovieListingViewModel @Inject constructor(
     private val genreUiListBuilder: GenreUiListBuilder
 ) : ViewModel() {
     private val _movieListingUiState: MutableStateFlow<MovieListingUiState> =
-        MutableStateFlow(MovieListingUiState.Loading)
+        MutableStateFlow(MovieListingUiState(isLoading = true))
     val movieListingUiState: StateFlow<MovieListingUiState> =
         _movieListingUiState.onStart { handleIntent(MoviesScreenIntent.LoadMovies(ALL_GENRE)) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000L),
-                initialValue = MovieListingUiState.Loading
+                initialValue = MovieListingUiState(isLoading = true)
             )
 
     private val _genresUiState: MutableStateFlow<GenresUiState> =
@@ -82,29 +82,27 @@ class MovieListingViewModel @Inject constructor(
     private fun loadMovies(genreName: String, isPaginatedRequest: Boolean = false) {
         viewModelScope.launch {
             if (!isPaginatedRequest) {
-                _movieListingUiState.update { MovieListingUiState.Loading }
+                _movieListingUiState.update { it.copy(isLoading = true) }
             } else {
-                _movieListingUiState.value.takeIf { it is MovieListingUiState.Success }?.let {
                     _movieListingUiState.update {
-                        (it as MovieListingUiState.Success).copy(isPaginatedRequest = true)
+                        it.copy(isLoading = true)
                     }
                 }
-            }
 
             when (val result = getMovies(
                 isFreshLoading = !isPaginatedRequest,
                 genre = genreName.takeIf { it != ALL_GENRE })) { // ALL genre will pass null genre
                 is MoviesResult.Success -> {
                     _movieListingUiState.update {
-                        MovieListingUiState.Success(list = result.movies.let {
+                        it.copy(list = result.movies.let {
                             it.map { movie -> movieToMovieUiMapper.map(movie) }
-                        }, selectedGenre = genreName, result.isLastPage)
+                        }, selectedGenre = genreName, isEndReached = result.isLastPage, isLoading = false)
                     }
                 }
 
                 is MoviesResult.MoviesError.GenericError -> {
                     _movieListingUiState.update {
-                        MovieListingUiState.Error(result.error)
+                        it.copy(error = Error(result.error), isLoading = false)
                     }
                     _effectChannel.send(
                         MovieScreenEffect.ShowSnackBar(
@@ -116,7 +114,7 @@ class MovieListingViewModel @Inject constructor(
 
                 MoviesResult.MoviesError.NoInternetException -> {
                     _movieListingUiState.update {
-                        MovieListingUiState.Error("No internet connection")
+                        it.copy(error = Error("No internet connection"), isLoading = false)
                     }
                     _effectChannel.send(MovieScreenEffect.ShowSnackBar(R.string.no_internet_message))
                 }
@@ -129,7 +127,7 @@ class MovieListingViewModel @Inject constructor(
             when (val result = getGenres()) {
                 is GenreResult.Success -> {
                     val selectedGenreName =
-                        (_movieListingUiState.value as? MovieListingUiState.Success)?.selectedGenre
+                        (_movieListingUiState.value as? MovieListingUiState)?.selectedGenre
 
                     val fullGenreList = genreUiListBuilder.build(
                         domainGenres = result.genres,
@@ -168,18 +166,16 @@ sealed interface MoviesScreenIntent {
     data class ChangeGenre(val genreUi: GenreUi) : MoviesScreenIntent
 }
 
-sealed class MovieListingUiState {
-    data object Loading : MovieListingUiState()
-    data class Success(
-        val list: List<MovieUi>,
-        val selectedGenre: String,
-        val isEndReached: Boolean = false,
-        val isPaginatedRequest: Boolean = false
-    ) :
-        MovieListingUiState()
 
-    data class Error(val message: String) : MovieListingUiState()
-}
+    data class MovieListingUiState(
+        val isLoading: Boolean = false,
+        val list: List<MovieUi>? = null,
+        val selectedGenre: String = ALL_GENRE,
+        val isEndReached: Boolean = false,
+        val error: Error? = null
+    )
+
+data class Error(val errorMessage: String)
 
 sealed interface GenresUiState {
     data object Loading : GenresUiState
