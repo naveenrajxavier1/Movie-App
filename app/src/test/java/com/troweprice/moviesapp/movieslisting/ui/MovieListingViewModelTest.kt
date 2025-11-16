@@ -63,7 +63,7 @@ class MovieListingViewModelTest {
     }
 
     @Test
-    fun `handleIntent LoadPaginatedMovies Given GetMovies returns success Then updates state from Suceess-Loading to Success`() = runTest {
+    fun `handleIntent LoadPaginatedMovies Given GetMovies returns success Then updates state from Success-Loading to Success`() = runTest {
         // GIVEN
         val domainMovies = listOf(mockk<Movie>())
         val uiMovies = listOf(mockk<MovieUi>())
@@ -76,13 +76,9 @@ class MovieListingViewModelTest {
         // VERIFY
         val stateJob = launch {
             viewModel.movieListingUiState.test {
-                assertTrue("State should be Loading", awaitItem() is MovieListingUiState.Success)
+                assertTrue("State should be Loading", awaitItem().isLoading )
                 val successState = awaitItem()
-                assertTrue(
-                    "Expected Success state, but was ${successState::class.simpleName}",
-                    successState is MovieListingUiState.Success
-                )
-                assertEquals(uiMovies, (successState as MovieListingUiState.Success).list)
+                assertEquals(uiMovies, successState.list)
                 expectNoEvents()
             }
         }
@@ -105,13 +101,9 @@ class MovieListingViewModelTest {
         // VERIFY
         val stateJob = launch {
             viewModel.movieListingUiState.test {
-                assertEquals("State should be Loading", MovieListingUiState.Loading, awaitItem())
+                assertTrue("State should be Loading", awaitItem().isLoading)
                 val successState = awaitItem()
-                assertTrue(
-                    "Expected Success state, but was ${successState::class.simpleName}",
-                    successState is MovieListingUiState.Success
-                )
-                assertEquals(uiMovies, (successState as MovieListingUiState.Success).list)
+                assertEquals(uiMovies, successState.list)
                 expectNoEvents()
             }
         }
@@ -136,14 +128,13 @@ class MovieListingViewModelTest {
             // WHEN & THEN
             val stateJob = launch {
                 viewModel.movieListingUiState.test {
-                    assertEquals(
+                    assertTrue(
                         "State should be Loading",
-                        MovieListingUiState.Loading,
-                        awaitItem()
+                        awaitItem().isLoading
                     )
                     val errorState = awaitItem()
-                    assertTrue("Expected Error state", errorState is MovieListingUiState.Error)
-                    assertEquals(errorMessage, (errorState as MovieListingUiState.Error).message)
+                    assertTrue("Expected Error state", errorState.error != null)
+                    assertEquals(errorMessage, errorState.error?.errorMessage)
                     expectNoEvents()
                 }
             }
@@ -174,8 +165,8 @@ class MovieListingViewModelTest {
             // WHEN & THEN
             val stateJob = launch {
                 viewModel.movieListingUiState.test {
-                    assertEquals("State should be Loading", MovieListingUiState.Loading, awaitItem())
-                    assertTrue("Expected Error state", awaitItem() is MovieListingUiState.Error)
+                    assertTrue("State should be Loading", awaitItem().isLoading)
+                    assertTrue("Expected Error state", awaitItem().error!= null)
                     expectNoEvents()
                 }
             }

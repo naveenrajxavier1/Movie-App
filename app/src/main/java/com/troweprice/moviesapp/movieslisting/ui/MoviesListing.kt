@@ -49,33 +49,32 @@ fun MoviesListingScreen(
     onSelectGenreClicked: () -> Unit,
     onGenreSelected: (GenreUi) -> Unit
 ) {
+    Box(modifier = modifier.fillMaxSize()) {
 
-        when (uiState) {
-            MovieListingUiState.Loading -> {
-                Progress()
-            }
-
-            is MovieListingUiState.Error -> {
-                ErrorScreen(error = uiState.message)
-            }
-
-            is MovieListingUiState.Success -> {
-                SucessScreen(
-                    modifier = modifier,
-                    movies = uiState.list,
-                    selectedGenre = uiState.selectedGenre,
-                    showPaginationLoader = uiState.isPaginatedRequest,
-                    isEndReached = uiState.isEndReached,
-                    genresUiState = genresUiState,
-                    isGenreDropDownExpanded = isGenreDropDownExpanded,
-                    onDismissRequest = onDismissRequest,
-                    onMovieClicked = onMovieClicked,
-                    onPaginationReached = onPaginationReached,
-                    onSelectGenreClicked = onSelectGenreClicked,
-                    onGenreSelected = onGenreSelected
-                )
-            }
+        uiState.list?.let {
+            SucessScreen(
+                modifier = modifier,
+                movies = uiState.list,
+                selectedGenre = uiState.selectedGenre,
+                isEndReached = uiState.isEndReached,
+                genresUiState = genresUiState,
+                isGenreDropDownExpanded = isGenreDropDownExpanded,
+                onDismissRequest = onDismissRequest,
+                onMovieClicked = onMovieClicked,
+                onPaginationReached = onPaginationReached,
+                onSelectGenreClicked = onSelectGenreClicked,
+                onGenreSelected = onGenreSelected
+            )
         }
+
+        if (uiState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+
+        uiState.error?.let {
+            Text(text = uiState.error.errorMessage, modifier = Modifier.align(Alignment.Center))
+        }
+    }
 }
 
 @Composable
@@ -83,7 +82,6 @@ fun SucessScreen(
     modifier: Modifier = Modifier,
     movies: List<MovieUi>,
     selectedGenre: String,
-    showPaginationLoader: Boolean,
     isEndReached: Boolean,
     genresUiState: GenresUiState,
     isGenreDropDownExpanded: Boolean,
@@ -105,21 +103,12 @@ fun SucessScreen(
         )
         MoviesListing(
             list = movies,
-            showPaginationLoader = showPaginationLoader,
             onMovieClicked = onMovieClicked,
             onPaginationReached = {
                 onPaginationReached.invoke(selectedGenre)
             },
             isEndOfMovies = isEndReached
         )
-    }
-}
-
-
-@Composable
-fun ErrorScreen(error: String) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Text(text = error)
     }
 }
 
@@ -180,7 +169,6 @@ fun MovieListingHeader(
 @Composable
 fun MoviesListing(
     list: List<MovieUi>,
-    showPaginationLoader: Boolean,
     onMovieClicked: (MovieUi) -> Unit,
     isEndOfMovies: Boolean,
     onPaginationReached: () -> Unit
@@ -204,17 +192,6 @@ fun MoviesListing(
                 MovieTile(it, onMovieClicked)
             }
         }
-
-        if (showPaginationLoader) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-    }
-}
-
-@Composable
-fun Progress() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
     }
 }
 
@@ -281,10 +258,9 @@ fun MovieTile(movie: MovieUi, onMovieClicked: (MovieUi) -> Unit) {
 @Preview(showBackground = true)
 fun ShowMoviesListingScreen() {
     MoviesListingScreen(
-        uiState = MovieListingUiState.Success(
-            getMovieList(),
+        uiState = MovieListingUiState(
+            list = getMovieList(),
             isEndReached = false,
-            isPaginatedRequest = true,
             selectedGenre = ALL_GENRE
         ), onMovieClicked = {},
         modifier = Modifier,
